@@ -29,9 +29,9 @@ app.post("/filters", upload.single("file"), (req, res) => {
     });
 });
 
-// Rota para upload de CSV com possibilidade de comparação
+// Rota para upload de CSV com possibilidade de comparação e intervalo de anos
 app.post("/upload", upload.single("file"), (req, res) => {
-  const { year, region, comparison } = req.query;
+  const { startYear, endYear, region, comparison } = req.query;
   const filteredData = [];
 
   fs.createReadStream(req.file.path)
@@ -41,10 +41,11 @@ app.post("/upload", upload.single("file"), (req, res) => {
       const dataYear = data.year;
       const value = parseFloat(data.value);
 
-      // Filtra os dados
+      // Filtra os dados pelo intervalo de ano, região e comparação
       if (
-        (!region || regionName === region || regionName === comparison) &&
-        (!year || dataYear === year)
+        (!startYear || dataYear >= startYear) &&
+        (!endYear || dataYear <= endYear) &&
+        (!region || regionName === region || regionName === comparison)
       ) {
         filteredData.push({ region: regionName, year: dataYear, value });
       }
